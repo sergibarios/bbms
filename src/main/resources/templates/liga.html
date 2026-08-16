@@ -171,7 +171,7 @@
 </div>
 
 <div th:if="${prediccionActual != null}">
-    <table class="plantilla-table prediccion-tabla" id="prediccion-vista">
+    <table class="prediccion-table" id="prediccion-vista">
         <thead>
         <tr>
             <th class="col-pos">Pos.</th>
@@ -179,7 +179,8 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="fila : ${prediccionActual.posiciones}">
+        <tr th:each="fila : ${prediccionActual.posiciones}"
+            th:classappend="${fila.posicion < 9} ? 'playoff' : (${fila.posicion >= 17} ? 'descenso' : '')">
             <td class="col-pos" th:text="${fila.posicion}"></td>
             <td th:text="${fila.equipo.nombre}"></td>
         </tr>

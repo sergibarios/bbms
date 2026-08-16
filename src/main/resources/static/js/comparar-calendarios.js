@@ -36,7 +36,7 @@ function celdaComparar(equipoId, jornada, dificultades, seleccionados) {
         : '?';
 
     return '<td class="comparar-celda' + (esInterno ? ' comparar-celda--interno' : '') + '">'
-        + (esLocal ? '🏠 ' : '@ ') + nombreCorto(rival) + ' ' + badge + '</td>';
+        + (esLocal ? 'v ' : '@ ') + nombreCorto(rival) + ' ' + badge + '</td>';
 }
 
 function generarComparativa() {

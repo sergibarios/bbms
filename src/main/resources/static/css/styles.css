@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap');
 /* ===== Variables globales ===== */
 :root {
     /* Colores: cambia estos dos para adaptar la paleta a cualquier competición */
@@ -7,9 +8,12 @@
     --color-primary-text: #d8dbe2;
     --color-secondary-text: #d8dbe2;
 
+    --color-link: #3f826d;
+    --color-link-hover: #52b293;
+
     /* Tipografías: una para títulos, otra para texto general */
-    --font-title: Georgia, 'Times New Roman', serif;
-    --font-text: -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    --font-title: 'DM Sans', Georgia, 'Times New Roman', serif;
+    --font-text: 'DM Sans', -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
 
     /* Color de los márgenes laterales (10% a cada lado) */
     --color-margen: #d8dbe2;
@@ -47,6 +51,16 @@ body {
     min-height: 100vh;
 }
 
+a {
+    color: var(--color-link);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--color-link-hover)
+
+}
+
 /* ===== Botones y enlaces con aspecto de botón ===== */
 .btn {
     display: inline-flex;
@@ -67,6 +81,7 @@ body {
 
 .btn:hover {
     opacity: 0.85;
+    color: var(--color-primary-text);
 }
 
 .btn--secondary {
@@ -217,15 +232,13 @@ h1, h2, h3 {
 
 /* ===== Tabla de plantilla ===== */
 .plantilla-table {
-    width: 100%;
+    width: 90%;
     border-collapse: collapse;
     margin-top: 1rem;
     margin-bottom: 3rem;
     font-size: 0.9rem;
 }
-
-.plantilla-table th,
-.plantilla-table td {
+.plantilla-table th,.plantilla-table td {
     border: 1px solid var(--color-secondary);
     padding: 0.4rem 0.6rem;
     text-align: left;
@@ -292,6 +305,104 @@ h1, h2, h3 {
     text-align: center;
     white-space: nowrap;
 }
+
+.plantilla-table th:nth-child(1),.plantilla-table td:nth-child(1) {width: 6%;}
+.plantilla-table th:nth-child(2),.plantilla-table td:nth-child(2) {width: 8%;}
+.plantilla-table th:nth-child(3),.plantilla-table td:nth-child(3) {width: 6%;}
+.plantilla-table th:nth-child(4),.plantilla-table td:nth-child(4) {width: 16%;}
+.plantilla-table th:nth-child(5),.plantilla-table td:nth-child(5) {width: 6%;}
+.plantilla-table th:nth-child(6),.plantilla-table td:nth-child(6) {width: 12%;}
+.plantilla-table th:nth-child(7),.plantilla-table td:nth-child(7) {width: 6%;}
+.plantilla-table th:nth-child(8),.plantilla-table td:nth-child(8) {width: 6%;}
+.plantilla-table th:nth-child(9),.plantilla-table td:nth-child(9) {width: 12%;}
+.plantilla-table th:nth-child(10),.plantilla-table td:nth-child(10) {width: 12%;}
+
+/* ===== Tabla de plantilla ===== */
+.calendar-general {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+    font-size: 0.9rem;
+
+}
+
+.calendar-general th,
+.calendar-general td {
+    border: 1px solid var(--color-secondary);
+    padding: 0.4rem 0.6rem;
+    text-align: left;
+    vertical-align: middle;
+    height: 2.8rem;
+    box-sizing: border-box;
+}
+
+.calendar-general thead th {
+    background: var(--color-secondary);
+    color: var(--color-secondary-text);
+    font-family: var(--font-title);
+}
+
+.calendar-general tbody tr:nth-child(even) {
+    background: var(--color-stripe);
+}
+
+.calendar-general .col-pos {
+    font-weight: bold;
+    text-align: center;
+}
+
+.calendar-general td.col-pos {
+    color: var(--color-primary);
+}
+
+.calendar-general th.col-pos {
+    color: var(--color-secondary-text);
+}
+
+.calendar-general .col-foto {
+    width: 1%;
+    text-align: center;
+}
+
+.calendar-general th[data-sort] {
+    cursor: pointer;
+    user-select: none;
+}
+
+.calendar-general th[data-sort]:hover {
+    opacity: 0.85;
+}
+
+.calendar-general th[data-sort]::after {
+    content: '⇅';
+    margin-left: 0.4rem;
+    font-size: 0.75rem;
+    opacity: 0.6;
+}
+
+.calendar-general th[data-sort][data-sort-dir="asc"]::after {
+    content: '↑';
+    opacity: 1;
+}
+
+.calendar-general th[data-sort][data-sort-dir="desc"]::after {
+    content: '↓';
+    opacity: 1;
+}
+
+.calendar-general .col-acciones {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.calendar-general th:nth-child(1),.calendar-general td:nth-child(1) {width: 5%;}
+.calendar-general th:nth-child(2),.calendar-general td:nth-child(2) {width: 10%;}
+.calendar-general th:nth-child(3),.calendar-general td:nth-child(3) {width: 5%;}
+.calendar-general th:nth-child(4),.calendar-general td:nth-child(4) {width: 25%;}
+.calendar-general th:nth-child(5),.calendar-general td:nth-child(5) {width: 25%;}
+.calendar-general th:nth-child(6),.calendar-general td:nth-child(6) {width: 25%;}
+
 
 /* ===== Plantillas de todos los equipos (vista compacta) ===== */
 .plantillas-filtros {
@@ -403,6 +514,23 @@ h1, h2, h3 {
     cursor: pointer;
 }
 
+.comparar-dificultad-table {
+    width: 50%;
+    table-layout: fixed;
+}
+
+.comparar-dificultad-table th:nth-child(1),
+.comparar-dificultad-table td:nth-child(1) {
+    width: 60%;
+}
+
+.comparar-dificultad-table th:nth-child(2),
+.comparar-dificultad-table td:nth-child(2),
+.comparar-dificultad-table th:nth-child(3),
+.comparar-dificultad-table td:nth-child(3) {
+    width: 20%;
+}
+
 .comparar-tabla {
     margin-top: 1.5rem;
 }
@@ -447,6 +575,60 @@ h1, h2, h3 {
 }
 
 /* ===== Predicción de liga (lista arrastrable) ===== */
+.prediccion-table {
+    max-width: 400px;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+    font-size: 0.9rem;
+}
+.prediccion-table th,.prediccion-table td {
+    border: 1px solid var(--color-secondary);
+    padding: 0.4rem 0.6rem;
+    text-align: left;
+    vertical-align: middle;
+    height: 2.8rem;
+    box-sizing: border-box;
+}
+
+.prediccion-table thead th {
+    background: var(--color-secondary);
+    color: var(--color-secondary-text);
+    font-family: var(--font-title);
+}
+
+.prediccion-table tbody tr:nth-child(even) {
+    background: var(--color-stripe);
+}
+
+.prediccion-table .col-pos {
+    font-weight: bold;
+    text-align: center;
+}
+
+.prediccion-table td.col-pos {
+    color: var(--color-primary);
+}
+
+.prediccion-table th.col-pos {
+    color: var(--color-secondary-text);
+}
+
+.prediccion-table .playoff td {
+    color: goldenrod;
+}
+
+.prediccion-table .descenso td {
+    color: var(--color-danger);
+}
+
+.prediccion-table td.col-pos.playoff { color: goldenrod; }
+
+.prediccion-table .col-pos .descenso {
+    color: var(--color-danger);
+}
+
+
 .prediccion-lista {
     list-style: decimal;
     max-width: 400px;
@@ -465,10 +647,6 @@ h1, h2, h3 {
 
 .prediccion-item.arrastrando {
     opacity: 0.4;
-}
-
-.prediccion-tabla {
-    max-width: 400px;
 }
 
 .prediccion-historial-grid {

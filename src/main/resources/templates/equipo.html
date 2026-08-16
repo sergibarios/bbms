@@ -291,14 +291,14 @@
 </table>
 
 <h2>Calendario</h2>
-<table class="plantilla-table" th:if="${!partidos.isEmpty()}">
+<table class="calendar-general" th:if="${!partidos.isEmpty()}">
     <thead>
     <tr>
         <th>Jornada</th>
         <th>Fecha</th>
         <th>Hora</th>
-        <th>Rival</th>
-        <th>Lugar</th>
+        <th>Local</th>
+        <th>Visitante</th>
         <th>Pabellón</th>
     </tr>
     </thead>
@@ -307,8 +307,10 @@
         <td th:text="${partido.jornada}"></td>
         <td th:text="${partido.fecha}"></td>
         <td th:text="${partido.hora}"></td>
-        <td th:text="${partido.local.id == equipo.id} ? ${partido.visitante.nombre} : ${partido.local.nombre}"></td>
-        <td th:text="${partido.local.id == equipo.id} ? 'Local' : 'Visitante'"></td>
+        <td th:text="${partido.local.nombre}"
+            th:classappend="${partido.local.id == equipo.id} ? 'equipo-actual' : ''"></td>
+        <td th:text="${partido.visitante.nombre}"
+            th:classappend="${partido.visitante.id == equipo.id} ? 'equipo-actual' : ''"></td>
         <td th:text="${partido.pabellon}"></td>
     </tr>
     </tbody>
