@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Comparar calendarios · ' + ${competicion.nombre}"></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar(competicionId=${competicion.id}, volverUrl=@{/liga/{id}/calendario(id=${competicion.id})})}"></div>
+
+<h1 th:text="'Comparar calendarios · ' + ${competicion.nombre}"></h1>
+<p>Esta comparativa es temporal: las dificultades que asignes no se guardan, solo sirven para generar la tabla de abajo.</p>
+
+<h2>1. Equipos a comparar</h2>
+<div class="comparar-checks">
+    <label th:each="equipo : ${equipos}" class="comparar-checks__item">
+        <input type="checkbox" class="chk-comparar" th:value="${equipo.id}">
+        <span th:text="${equipo.nombre}"></span>
+    </label>
+</div>
+
+<h2>2. Dificultad de cada equipo</h2>
+<table class="plantilla-table">
+    <thead>
+    <tr>
+        <th>Equipo</th>
+        <th>Dificultad como local</th>
+        <th>Dificultad como visitante</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="equipo : ${equipos}">
+        <td th:text="${equipo.nombre}"></td>
+        <td>
+            <select th:id="'dif-local-' + ${equipo.id}">
+                <option th:each="n : ${#numbers.sequence(1,5)}" th:value="${n}" th:text="${n}" th:selected="${n == 3}"></option>
+            </select>
+        </td>
+        <td>
+            <select th:id="'dif-visitante-' + ${equipo.id}">
+                <option th:each="n : ${#numbers.sequence(1,5)}" th:value="${n}" th:text="${n}" th:selected="${n == 3}"></option>
+            </select>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="acciones-fila">
+    <button type="button" class="btn" onclick="generarComparativa()">Generar tabla comparativa</button>
+</div>
+
+<div id="resultado-comparativa"></div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const EQUIPOS = /*[[${equiposResumen}]]*/ [];
+    const PARTIDOS = /*[[${partidosResumen}]]*/ [];
+    /*]]>*/
+</script>
+<script th:src="@{/js/comparar-calendarios.js}"></script>
+
+</body>
+</html>

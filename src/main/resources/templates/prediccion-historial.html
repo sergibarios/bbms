@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Historial de predicciones · ' + ${competicion.nombre}"></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar(competicionId=${competicion.id}, volverUrl=@{/liga/{id}(id=${competicion.id})})}"></div>
+
+<h1 th:text="'Historial de predicciones · ' + ${competicion.nombre}"></h1>
+
+<div class="prediccion-historial-grid">
+    <div th:each="prediccion : ${historial}" class="prediccion-historial-item">
+        <h3 th:text="${#temporals.format(prediccion.fecha, 'dd/MM/yyyy HH:mm')}"></h3>
+        <table class="plantilla-table prediccion-tabla">
+            <tbody>
+            <tr th:each="fila : ${prediccion.posiciones}">
+                <td class="col-pos" th:text="${fila.posicion}"></td>
+                <td th:text="${fila.equipo.nombre}"></td>
+            </tr>
+            </tbody>
+        </table>
+        <form th:action="@{/liga/{ligaId}/prediccion/{id}/eliminar(ligaId=${competicion.id},id=${prediccion.id})}" method="post">
+            <button type="submit" class="btn btn--danger btn--small" onclick="return confirm('¿Eliminar esta predicción del historial?')">Eliminar</button>
+        </form>
+    </div>
+</div>
+<p th:if="${historial.isEmpty()}">Todavía no hay predicciones guardadas para esta liga.</p>
+
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Enfrentamientos · ' + ${competicion.nombre}"></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar(competicionId=${competicion.id}, volverUrl=@{/liga/{id}(id=${competicion.id})})}"></div>
+
+<h1 th:text="'Enfrentamientos · ' + ${competicion.nombre}"></h1>
+
+<div class="tabla-enfrentamientos-wrap">
+    <table class="tabla-enfrentamientos">
+        <thead>
+        <tr>
+            <th>Local \ Visitante</th>
+            <th th:each="equipo : ${equipos}" th:text="${equipo.abreviatura} ?: ${equipo.nombre}"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="fila : ${filas}">
+            <th>
+                <a th:href="@{/equipos/{id}(id=${fila.equipoLocal.id})}" th:text="${fila.equipoLocal.nombre}"></a>
+            </th>
+            <td th:each="celda : ${fila.celdas}"
+                th:classappend="${celda == null} ? 'tabla-enfrentamientos__vacia' : ''"
+                th:text="${celda} ?: '—'"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
