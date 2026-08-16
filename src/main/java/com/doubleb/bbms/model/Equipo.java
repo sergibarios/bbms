@@ -37,6 +37,8 @@ public class Equipo {
     @Column(columnDefinition = "TEXT")
     private String historial;
 
+    private Integer orden;
+
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "varchar(30)")
     private Europa europa;
@@ -136,6 +138,13 @@ public class Equipo {
 
     public void setEuropa(Europa europa) {
         this.europa = europa;
+    }
+
+    public Integer getOrden() {
+        return orden;
+    }
+    public void setOrden(Integer orden) {
+        this.orden = orden;
     }
 
     public List<Jugador> getPlantilla() {

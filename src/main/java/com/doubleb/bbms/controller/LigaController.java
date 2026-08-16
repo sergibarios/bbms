@@ -1,12 +1,16 @@
 package com.doubleb.bbms.controller;
 
+import com.doubleb.bbms.dto.EnfrentamientoFila;
 import com.doubleb.bbms.dto.EquipoPlantilla;
+import com.doubleb.bbms.dto.EquipoResumen;
 import com.doubleb.bbms.dto.FilaPosicion;
 import com.doubleb.bbms.dto.ImportResultado;
+import com.doubleb.bbms.dto.PartidoResumen;
 import com.doubleb.bbms.model.Competicion;
 import com.doubleb.bbms.model.Equipo;
 import com.doubleb.bbms.model.Jugador;
 import com.doubleb.bbms.model.Partido;
+import com.doubleb.bbms.model.PrediccionLiga;
 import com.doubleb.bbms.model.enums.Pos;
 import com.doubleb.bbms.service.CalendarioService;
 import com.doubleb.bbms.service.CompeticionService;
@@ -15,6 +19,7 @@ import com.doubleb.bbms.service.JugadorImportService;
 import com.doubleb.bbms.service.JugadorService;
 import com.doubleb.bbms.service.PartidoImportService;
 import com.doubleb.bbms.service.PartidoService;
+import com.doubleb.bbms.service.PrediccionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +31,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/liga")
@@ -41,6 +49,7 @@ public class LigaController {
     private final PartidoService partidoService;
     private final JugadorImportService jugadorImportService;
     private final PartidoImportService partidoImportService;
+    private final PrediccionService prediccionService;
 
     public LigaController(CompeticionService competicionService,
                           EquipoService equipoService,
@@ -48,7 +57,8 @@ public class LigaController {
                           CalendarioService calendarioService,
                           PartidoService partidoService,
                           JugadorImportService jugadorImportService,
-                          PartidoImportService partidoImportService) {
+                          PartidoImportService partidoImportService,
+                          PrediccionService prediccionService) {
         this.competicionService = competicionService;
         this.equipoService = equipoService;
         this.jugadorService = jugadorService;
@@ -56,6 +66,7 @@ public class LigaController {
         this.partidoService = partidoService;
         this.jugadorImportService = jugadorImportService;
         this.partidoImportService = partidoImportService;
+        this.prediccionService = prediccionService;
     }
 
     @GetMapping("/{competicionId}")
@@ -65,8 +76,48 @@ public class LigaController {
 
         model.addAttribute("competicion", competicion);
         model.addAttribute("equipos", equipoService.findByCompeticion(competicion));
+        model.addAttribute("prediccionActual", prediccionService.actual(competicion).orElse(null));
 
         return "liga";
+    }
+
+    @PostMapping("/{competicionId}/prediccion")
+    public String guardarPrediccion(@PathVariable Long competicionId, @RequestParam("equipoIds") List<Long> equipoIds) {
+        Competicion competicion = competicionService.findById(competicionId)
+                .orElseThrow(() -> new IllegalArgumentException("Competición no encontrada: " + competicionId));
+        prediccionService.crear(competicion, equipoIds);
+        return "redirect:/liga/" + competicionId;
+    }
+
+    @PostMapping("/{competicionId}/equipos/orden")
+    public String guardarOrdenEquipos(@PathVariable Long competicionId, @RequestParam("equipoIds") List<Long> equipoIds) {
+        int orden = 0;
+        for (Long equipoId : equipoIds) {
+            Equipo equipo = equipoService.findById(equipoId)
+                    .orElseThrow(() -> new IllegalArgumentException("Equipo no encontrado: " + equipoId));
+            equipo.setOrden(orden);
+            equipoService.save(equipo);
+            orden++;
+        }
+        return "redirect:/liga/" + competicionId;
+    }
+
+    @GetMapping("/{competicionId}/prediccion/historial")
+    public String verHistorialPrediccion(@PathVariable Long competicionId, Model model) {
+        Competicion competicion = competicionService.findById(competicionId)
+                .orElseThrow(() -> new IllegalArgumentException("Competición no encontrada: " + competicionId));
+
+        List<PrediccionLiga> historial = prediccionService.historial(competicion);
+
+        model.addAttribute("competicion", competicion);
+        model.addAttribute("historial", historial);
+        return "prediccion-historial";
+    }
+
+    @PostMapping("/{competicionId}/prediccion/{prediccionId}/eliminar")
+    public String eliminarPrediccion(@PathVariable Long competicionId, @PathVariable Long prediccionId) {
+        prediccionService.eliminar(prediccionId);
+        return "redirect:/liga/" + competicionId + "/prediccion/historial";
     }
 
     @GetMapping("/{competicionId}/plantillas")
@@ -123,6 +174,75 @@ public class LigaController {
         model.addAttribute("partidos", partidos);
 
         return "calendario";
+    }
+
+    @GetMapping("/{competicionId}/enfrentamientos")
+    public String verEnfrentamientos(@PathVariable Long competicionId, Model model) {
+        Competicion competicion = competicionService.findById(competicionId)
+                .orElseThrow(() -> new IllegalArgumentException("Competición no encontrada: " + competicionId));
+
+        List<Equipo> equipos = equipoService.findByCompeticion(competicion);
+        List<Partido> partidos = calendarioService.findByCompeticion(competicion)
+                .map(partidoService::findByCalendario)
+                .orElseGet(ArrayList::new);
+
+        DateTimeFormatter formatoCorto = DateTimeFormatter.ofPattern("dd/MM");
+        Map<String, String> fechaPorPareja = new HashMap<>();
+        for (Partido partido : partidos) {
+            if (partido.getFecha() == null) {
+                continue;
+            }
+            String clave = partido.getLocal().getId() + "_" + partido.getVisitante().getId();
+            String fecha = formatoCorto.format(partido.getFecha());
+            fechaPorPareja.merge(clave, fecha, (actual, nueva) -> actual);
+        }
+
+        List<EnfrentamientoFila> filas = new ArrayList<>();
+        for (Equipo local : equipos) {
+            List<String> celdas = new ArrayList<>();
+            for (Equipo visitante : equipos) {
+                if (local.getId().equals(visitante.getId())) {
+                    celdas.add(null);
+                } else {
+                    celdas.add(fechaPorPareja.get(local.getId() + "_" + visitante.getId()));
+                }
+            }
+            filas.add(new EnfrentamientoFila(local, celdas));
+        }
+
+        model.addAttribute("competicion", competicion);
+        model.addAttribute("equipos", equipos);
+        model.addAttribute("filas", filas);
+        return "enfrentamientos";
+    }
+
+    @GetMapping("/{competicionId}/comparar-calendarios")
+    public String verCompararCalendarios(@PathVariable Long competicionId, Model model) {
+        Competicion competicion = competicionService.findById(competicionId)
+                .orElseThrow(() -> new IllegalArgumentException("Competición no encontrada: " + competicionId));
+
+        List<Equipo> equipos = equipoService.findByCompeticion(competicion);
+        List<Partido> partidos = calendarioService.findByCompeticion(competicion)
+                .map(partidoService::findByCalendario)
+                .orElseGet(ArrayList::new);
+
+        DateTimeFormatter formatoCorto = DateTimeFormatter.ofPattern("dd/MM");
+        List<EquipoResumen> equiposResumen = equipos.stream()
+                .map(e -> new EquipoResumen(e.getId(), e.getNombre(), e.getAbreviatura()))
+                .toList();
+        List<PartidoResumen> partidosResumen = partidos.stream()
+                .map(p -> new PartidoResumen(
+                        p.getJornada(),
+                        p.getFecha() != null ? formatoCorto.format(p.getFecha()) : null,
+                        p.getLocal().getId(), p.getLocal().getNombre(),
+                        p.getVisitante().getId(), p.getVisitante().getNombre()))
+                .toList();
+
+        model.addAttribute("competicion", competicion);
+        model.addAttribute("equipos", equipos);
+        model.addAttribute("equiposResumen", equiposResumen);
+        model.addAttribute("partidosResumen", partidosResumen);
+        return "comparar-calendarios";
     }
 
     @PostMapping("/{competicionId}/calendario/importar")

@@ -110,7 +110,7 @@
     </form>
 </dialog>
 
-<div class="equipos-grid">
+<div class="equipos-grid" id="equipos-grid-vista">
     <a class="equipo-card" th:each="equipo : ${equipos}"
        th:href="@{/equipos/{id}(id=${equipo.id})}">
         <div class="equipo-card__logo">
@@ -124,12 +124,89 @@
 
 <div class="acciones-fila">
     <a class="btn btn--secondary" th:href="@{/liga/{id}/plantillas(id=${competicion.id})}">Ver plantillas de todos los equipos</a>
+    <button type="button" class="btn btn--secondary" onclick="document.getElementById('equipos-grid-vista').style.display='none'; document.getElementById('equipos-orden-editor').style.display='block'; this.style.display='none';">Ordenar equipos</button>
+</div>
+
+<div id="equipos-orden-editor" style="display:none;">
+    <p>Arrastra las tarjetas para cambiar el orden:</p>
+    <form th:action="@{/liga/{id}/equipos/orden(id=${competicion.id})}" method="post">
+        <div class="equipos-grid" id="equipos-grid-orden">
+            <div class="equipo-card equipo-card--arrastrable" th:each="equipo : ${equipos}" th:data-equipo-id="${equipo.id}" draggable="true">
+                <div class="equipo-card__logo">
+                    <img th:src="${equipo.logoUrl} ?: @{/images/logos/default-equipo.svg}" th:alt="${equipo.nombre}">
+                </div>
+                <div class="equipo-card__nombre">
+                    <span th:text="${equipo.nombre}"></span>
+                </div>
+                <input type="hidden" name="equipoIds" th:value="${equipo.id}">
+            </div>
+        </div>
+        <div class="acciones-fila">
+            <button type="submit" class="btn">Guardar orden</button>
+        </div>
+    </form>
 </div>
 
 <h2>Calendario</h2>
 <div class="acciones-fila">
     <a class="btn btn--secondary" th:href="@{/liga/{id}/calendario(id=${competicion.id})}">Ver calendario completo</a>
+    <a class="btn btn--secondary" th:href="@{/liga/{id}/enfrentamientos(id=${competicion.id})}">Tabla de enfrentamientos</a>
 </div>
+
+<h2>Predicción</h2>
+
+<div th:if="${prediccionActual == null}">
+    <p>Todavía no hay una predicción para esta liga. Ordena los equipos de mejor a peor clasificado (arrastra para reordenar):</p>
+    <form th:action="@{/liga/{id}/prediccion(id=${competicion.id})}" method="post">
+        <ol class="prediccion-lista">
+            <li th:each="equipo : ${equipos}" th:data-equipo-id="${equipo.id}" draggable="true" class="prediccion-item">
+                <span th:text="${equipo.nombre}"></span>
+                <input type="hidden" name="equipoIds" th:value="${equipo.id}">
+            </li>
+        </ol>
+        <div class="acciones-fila">
+            <button type="submit" class="btn">Guardar predicción</button>
+        </div>
+    </form>
+</div>
+
+<div th:if="${prediccionActual != null}">
+    <table class="plantilla-table prediccion-tabla" id="prediccion-vista">
+        <thead>
+        <tr>
+            <th class="col-pos">Pos.</th>
+            <th>Equipo</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="fila : ${prediccionActual.posiciones}">
+            <td class="col-pos" th:text="${fila.posicion}"></td>
+            <td th:text="${fila.equipo.nombre}"></td>
+        </tr>
+        </tbody>
+    </table>
+    <div class="acciones-fila">
+        <button type="button" class="btn btn--secondary" onclick="document.getElementById('prediccion-vista').style.display='none'; document.getElementById('prediccion-editor').style.display='block'; this.parentElement.style.display='none';">Editar predicción</button>
+        <a class="btn btn--secondary" th:href="@{/liga/{id}/prediccion/historial(id=${competicion.id})}">Ver historial</a>
+    </div>
+
+    <div id="prediccion-editor" style="display:none;">
+        <form th:action="@{/liga/{id}/prediccion(id=${competicion.id})}" method="post">
+            <ol class="prediccion-lista">
+                <li th:each="fila : ${prediccionActual.posiciones}" th:data-equipo-id="${fila.equipo.id}" draggable="true" class="prediccion-item">
+                    <span th:text="${fila.equipo.nombre}"></span>
+                    <input type="hidden" name="equipoIds" th:value="${fila.equipo.id}">
+                </li>
+            </ol>
+            <div class="acciones-fila">
+                <button type="submit" class="btn">Guardar cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:src="@{/js/prediccion.js}"></script>
+<script th:src="@{/js/equipos-orden.js}"></script>
 
 </body>
 </html>

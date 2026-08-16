@@ -23,6 +23,7 @@
         <input type="file" name="archivo" accept=".csv" required>
         <button type="submit" class="btn btn--secondary">Importar calendario (CSV)</button>
     </form>
+    <a class="btn btn--secondary" th:href="@{/liga/{id}/comparar-calendarios(id=${competicion.id})}">Comparar calendarios</a>
 </div>
 
 <div class="watchlist-filtros">
