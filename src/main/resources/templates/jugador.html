@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><title th:text="${jugador.nombre}"></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar(competicionId=${jugador.equipo.competicion.id}, volverUrl=@{/equipos/{id}(id=${jugador.equipo.id})})}"></div>
+
+<div class="ficha-cabecera">
+    <div class="ficha-cabecera__texto">
+        <h1 th:text="${jugador.nombre}"></h1>
+        <span th:if="${jugador.watchlisted}">⭐ En watchlist</span>
+    </div>
+    <div class="ficha-cabecera__foto">
+        <img th:src="${jugador.fotoUrl} ?: @{/images/jugadores/default-jugador.svg}" th:alt="${jugador.nombre}">
+    </div>
+</div>
+
+<div class="ficha-info">
+    <div class="ficha-info__fila">
+        <div class="ficha-info__campo">
+            <span class="ficha-info__label">Posición</span>
+            <span th:text="${jugador.posicion != null ? jugador.posicion.label : ''}"></span>
+        </div>
+        <div class="ficha-info__campo">
+            <span class="ficha-info__label">Licencia</span>
+            <span th:text="${jugador.licencia != null ? jugador.licencia.label : ''}"></span>
+        </div>
+        <div class="ficha-info__campo">
+            <span class="ficha-info__label">País</span>
+            <span th:text="${jugador.pais}"></span>
+        </div>
+    </div>
+    <div class="ficha-info__fila">
+        <div class="ficha-info__campo">
+            <span class="ficha-info__label">Edad</span>
+            <span th:text="${edad}"></span>
+        </div>
+        <div class="ficha-info__campo">
+            <span class="ficha-info__label">Altura</span>
+            <span th:text="${jugador.cm} + ' cm'"></span>
+        </div>
+        <div class="ficha-info__campo">
+            <span class="ficha-info__label">Contrato hasta</span>
+            <span th:text="${jugador.contrato}"></span>
+        </div>
+    </div>
+    <div class="ficha-info__fila">
+        <div class="ficha-info__campo">
+            <span class="ficha-info__label">Origen</span>
+            <span th:text="${jugador.origen != null ? jugador.origen.label : ''}"></span>
+        </div>
+        <div class="ficha-info__campo">
+            <span class="ficha-info__label">Sobre el jugador</span>
+            <span th:text="${jugador.descripcion}"></span>
+        </div>
+    </div>
+</div>
+
+<div class="acciones-fila">
+    <button type="button" class="btn btn--secondary" onclick="document.getElementById('dialog-editar-jugador').showModal()">Editar jugador</button>
+</div>
+
+<dialog id="dialog-editar-jugador" class="modal">
+    <form class="modal-form" th:action="@{/jugadores/{id}(id=${jugador.id})}" method="post">
+        <h3>Editar jugador</h3>
+
+        <input type="hidden" name="equipoId" th:value="${jugador.equipo.id}">
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo">
+                Posición
+                <select name="posicion">
+                    <option value="">-</option>
+                    <option th:each="p : ${T(com.doubleb.bbms.model.enums.Pos).values()}"
+                            th:value="${p}" th:text="${p.label}"
+                            th:selected="${jugador.posicion == p}"></option>
+                </select>
+            </label>
+            <label class="modal-form__campo">
+                Nombre
+                <input type="text" name="nombre" th:value="${jugador.nombre}" required>
+            </label>
+            <label class="modal-form__campo">
+                Foto (URL)
+                <input type="text" name="fotoUrl" th:value="${jugador.fotoUrl}" placeholder="/images/jugadores/nombre.png">
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo">
+                Licencia
+                <select name="licencia">
+                    <option value="">-</option>
+                    <option th:each="l : ${T(com.doubleb.bbms.model.enums.Licencia).values()}"
+                            th:value="${l}" th:text="${l.label}"
+                            th:selected="${jugador.licencia == l}"></option>
+                </select>
+            </label>
+            <label class="modal-form__campo">
+                País
+                <input type="text" name="pais" th:value="${jugador.pais}">
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo">
+                Fecha de nacimiento
+                <input type="date" name="dob" th:value="${jugador.dob}">
+            </label>
+            <label class="modal-form__campo">
+                Altura (cm)
+                <input type="number" name="cm" th:value="${jugador.cm}">
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo">
+                Año fin de contrato
+                <input type="number" name="contrato" th:value="${jugador.contrato}">
+            </label>
+            <label class="modal-form__campo">
+                Origen
+                <select name="origen">
+                    <option value="">-</option>
+                    <option th:each="o : ${T(com.doubleb.bbms.model.enums.Origen).values()}"
+                            th:value="${o}" th:text="${o.label}"
+                            th:selected="${jugador.origen == o}"></option>
+                </select>
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo modal-form__campo--ancho">
+                Descripción
+                <textarea name="descripcion" th:text="${jugador.descripcion}"></textarea>
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo modal-form__campo--checkbox">
+                <input type="checkbox" name="watchlisted" th:checked="${jugador.watchlisted}"> Watchlisted
+            </label>
+        </div>
+
+        <div class="modal-form__acciones">
+            <button type="button" class="btn btn--ghost" onclick="this.closest('dialog').close()">Cancelar</button>
+            <button type="submit" class="btn">Guardar</button>
+        </div>
+    </form>
+</dialog>
+
+<h2>Vídeos</h2>
+<ul style="list-style:none; margin:0; padding:0;">
+    <li th:each="video : ${videos}" class="video-item">
+        <a th:href="${video.url}" target="_blank" th:text="${video.titulo} ?: ${video.url}"></a>
+        <form th:action="@{/videos/{id}(id=${video.id})}" method="post" class="video-item__renombrar">
+            <input type="text" name="titulo" th:value="${video.titulo}" placeholder="Nuevo título" size="20">
+            <button type="submit" class="btn btn--secondary btn--small">Renombrar</button>
+        </form>
+        <form th:action="@{/videos/{id}/eliminar(id=${video.id})}" method="post">
+            <button type="submit" class="btn btn--danger btn--small" onclick="return confirm('¿Eliminar este vídeo?')">Eliminar</button>
+        </form>
+    </li>
+</ul>
+<p th:if="${videos.isEmpty()}">Sin vídeos guardados.</p>
+
+<form th:action="@{/videos}" method="post" class="modal-form" style="max-width:400px">
+    <input type="hidden" name="jugadorId" th:value="${jugador.id}">
+    <label class="modal-form__campo">
+        URL
+        <input type="text" name="url" placeholder="https://youtu.be/..." required>
+    </label>
+    <label class="modal-form__campo">
+        Título (opcional)
+        <input type="text" name="titulo">
+    </label>
+    <div class="modal-form__acciones">
+        <button type="submit" class="btn">+ Añadir vídeo</button>
+    </div>
+</form>
+
+</body>
+</html>

@@ -1,0 +1,8 @@
+https://www.baeldung.com/spring-boot
+
+https://www.thymeleaf.org/doc/tutorials/3.1/usingthymeleaf.html
+
+https://www.baeldung.com/spring-boot-h2-database
+
+Te pasaré una lista de jugadores de baloncesto. Quiero que busques su ficha técnica en la web de la ACB (acb.com) y me devuelvas un csv con columnas nombre (el que te he dado), foto (link de la foto de la web de ACB), fecha de nacimiento (la encontrarás en la web), y altura.
+

@@ -1,0 +1,13 @@
+<nav th:fragment="navbar(competicionId, volverUrl)" class="navbar">
+    <div class="navbar__lado navbar__lado--izq">
+        <a th:if="${volverUrl != null}" class="navbar__volver" th:href="${volverUrl}" title="Volver" aria-label="Volver">←</a>
+    </div>
+    <div class="navbar__centro">
+        <a th:href="@{/}">BBMS</a>
+    </div>
+    <div class="navbar__lado navbar__lado--der">
+        <a th:if="${competicionId != null}" th:href="@{/liga/{id}(id=${competicionId})}">Liga</a>
+        <a th:if="${competicionId != null}" th:href="@{/liga/{id}/watchlist(id=${competicionId})}">Watchlist</a>
+        <a th:href="@{/competiciones}">Competiciones</a>
+    </div>
+</nav>

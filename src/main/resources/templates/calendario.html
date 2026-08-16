@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Calendario · ' + ${competicion.nombre}"></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar(competicionId=${competicion.id}, volverUrl=@{/liga/{id}(id=${competicion.id})})}"></div>
+
+<h1 th:text="'Calendario · ' + ${competicion.nombre}"></h1>
+
+<div th:if="${importados != null}" class="ficha-info__campo" style="margin-bottom:1rem;">
+    <p th:text="'Importados: ' + ${importados} + ' partido(s).'"></p>
+    <ul th:if="${erroresImport != null and !erroresImport.isEmpty()}">
+        <li th:each="error : ${erroresImport}" th:text="${error}" style="color: var(--color-danger);"></li>
+    </ul>
+</div>
+
+<div class="acciones-fila">
+    <form th:action="@{/liga/{id}/calendario/importar(id=${competicion.id})}" method="post" enctype="multipart/form-data" class="acciones-fila" style="margin:0;">
+        <input type="file" name="archivo" accept=".csv" required>
+        <button type="submit" class="btn btn--secondary">Importar calendario (CSV)</button>
+    </form>
+</div>
+
+<div class="watchlist-filtros">
+    <label class="modal-form__campo">
+        Equipo
+        <select id="filtro-equipo">
+            <option value="">Todos los equipos</option>
+            <option th:each="equipo : ${equipos}" th:value="${equipo.id}" th:text="${equipo.nombre}"></option>
+        </select>
+    </label>
+    <label class="modal-form__campo">
+        Jornada
+        <select id="filtro-jornada">
+            <option value="">Todas las jornadas</option>
+        </select>
+    </label>
+</div>
+
+<table class="plantilla-table sortable" id="tabla-calendario">
+    <thead>
+    <tr>
+        <th data-sort>Jornada</th>
+        <th data-sort>Fecha</th>
+        <th data-sort>Hora</th>
+        <th data-sort>Local</th>
+        <th data-sort>Visitante</th>
+        <th data-sort>Pabellón</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="partido : ${partidos}"
+        th:data-jornada="${partido.jornada}"
+        th:data-local-id="${partido.local.id}"
+        th:data-visitante-id="${partido.visitante.id}">
+        <td th:text="${partido.jornada}"></td>
+        <td th:text="${partido.fecha}"></td>
+        <td th:text="${partido.hora}"></td>
+        <td th:text="${partido.local.nombre}"></td>
+        <td th:text="${partido.visitante.nombre}"></td>
+        <td th:text="${partido.pabellon}"></td>
+    </tr>
+    </tbody>
+</table>
+<p th:if="${partidos.isEmpty()}">Todavía no hay partidos en el calendario de esta competición.</p>
+
+<script th:src="@{/js/sortable-table.js}"></script>
+<script th:src="@{/js/calendario.js}"></script>
+
+</body>
+</html>

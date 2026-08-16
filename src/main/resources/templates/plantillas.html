@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Plantillas · ' + ${competicion.nombre}"></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar(competicionId=${competicion.id}, volverUrl=@{/liga/{id}(id=${competicion.id})})}"></div>
+
+<h1 th:text="'Plantillas · ' + ${competicion.nombre}"></h1>
+
+<div class="plantillas-filtros">
+    <label th:each="plantilla : ${plantillas}" class="plantillas-filtros__item">
+        <input type="checkbox" class="filtro-equipo" checked th:value="${plantilla.equipo.id}">
+        <span th:text="${plantilla.equipo.nombre}"></span>
+    </label>
+</div>
+
+<div class="plantillas-grid">
+    <div class="plantilla-mini-wrap" th:each="plantilla : ${plantillas}" th:data-equipo-id="${plantilla.equipo.id}">
+        <table class="plantilla-mini">
+            <thead>
+            <tr>
+                <th colspan="2" class="plantilla-mini__equipo" th:text="${plantilla.equipo.nombre}"></th>
+            </tr>
+            <tr th:if="${plantilla.equipo.entrenador}">
+                <td colspan="2" class="plantilla-mini__entrenador" th:text="${plantilla.equipo.entrenador}"></td>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="fila : ${plantilla.filas}">
+                <td class="col-pos" th:text="${fila.posicion}"></td>
+                <td>
+                    <th:block th:each="jugador, iter : ${fila.jugadores}">
+                        <span th:if="${jugador.licencia != null and jugador.licencia.name() == 'JFL'}"
+                              class="licencia-jfl" th:text="${jugador.nombre}"></span>
+                        <span th:if="${jugador.licencia != null and jugador.licencia.name() == 'EXT'}"
+                              class="licencia-ext" th:text="${jugador.nombre}"></span>
+                        <span th:if="${jugador.licencia == null or (jugador.licencia.name() != 'JFL' and jugador.licencia.name() != 'EXT')}"
+                              th:text="${jugador.nombre}"></span>
+                        <span th:if="${!iter.last}"> - </span>
+                    </th:block>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script th:src="@{/js/plantillas.js}"></script>
+
+</body>
+</html>

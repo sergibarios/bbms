@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Competiciones</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar(competicionId=${null}, volverUrl=${null})}"></div>
+
+<h1>Competiciones</h1>
+
+<div class="acciones-fila">
+    <button type="button" class="btn" onclick="document.getElementById('dialog-nueva-competicion').showModal()">+ Nueva competición</button>
+</div>
+
+<dialog id="dialog-nueva-competicion" class="modal">
+    <form class="modal-form" th:action="@{/competiciones}" method="post">
+        <h3>Nueva competición</h3>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo">
+                Nombre
+                <input type="text" name="nombre" required>
+            </label>
+            <label class="modal-form__campo">
+                Año
+                <input type="number" name="year" required>
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo modal-form__campo--ancho">
+                Descripción
+                <textarea name="descripcion"></textarea>
+            </label>
+        </div>
+
+        <div class="modal-form__acciones">
+            <button type="button" class="btn btn--ghost" onclick="this.closest('dialog').close()">Cancelar</button>
+            <button type="submit" class="btn">Guardar</button>
+        </div>
+    </form>
+</dialog>
+
+<table class="plantilla-table">
+    <thead>
+    <tr>
+        <th>Nombre</th>
+        <th>Año</th>
+        <th class="col-acciones">Acciones</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="competicion : ${competiciones}">
+        <td th:text="${competicion.nombre}"></td>
+        <td th:text="${competicion.year}"></td>
+        <td class="col-acciones">
+            <div class="col-acciones__inner">
+                <a class="btn btn--small" th:href="@{/liga/{id}(id=${competicion.id})}">Ver liga</a>
+                <button type="button" class="btn btn--secondary btn--small"
+                        th:onclick="'document.getElementById(\'dialog-editar-' + ${competicion.id} + '\').showModal()'">Editar</button>
+                <form th:action="@{/competiciones/{id}/eliminar(id=${competicion.id})}" method="post">
+                    <button type="submit" class="btn btn--danger btn--small"
+                            onclick="return confirm('¿Seguro que quieres eliminar esta competición?')">
+                        Eliminar
+                    </button>
+                </form>
+            </div>
+
+            <dialog th:id="'dialog-editar-' + ${competicion.id}" class="modal">
+                <form class="modal-form" th:action="@{/competiciones/{id}(id=${competicion.id})}" method="post">
+                    <h3>Editar competición</h3>
+
+                    <div class="modal-form__fila">
+                        <label class="modal-form__campo">
+                            Nombre
+                            <input type="text" name="nombre" th:value="${competicion.nombre}" required>
+                        </label>
+                        <label class="modal-form__campo">
+                            Año
+                            <input type="number" name="year" th:value="${competicion.year}" required>
+                        </label>
+                    </div>
+
+                    <div class="modal-form__fila">
+                        <label class="modal-form__campo modal-form__campo--ancho">
+                            Descripción
+                            <textarea name="descripcion" th:text="${competicion.descripcion}"></textarea>
+                        </label>
+                    </div>
+
+                    <div class="modal-form__acciones">
+                        <button type="button" class="btn btn--ghost" onclick="this.closest('dialog').close()">Cancelar</button>
+                        <button type="submit" class="btn">Guardar</button>
+                    </div>
+                </form>
+            </dialog>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>

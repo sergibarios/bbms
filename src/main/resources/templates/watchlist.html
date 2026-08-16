@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Watchlist · ' + ${competicion.nombre}"></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar(competicionId=${competicion.id}, volverUrl=@{/liga/{id}(id=${competicion.id})})}"></div>
+
+<h1 th:text="'Watchlist · ' + ${competicion.nombre}"></h1>
+
+<div class="watchlist-player-wrap">
+    <iframe id="watchlist-player" src="" allowfullscreen></iframe>
+    <p id="watchlist-player-vacio" class="watchlist-player-vacio">Selecciona un vídeo de la lista para reproducirlo</p>
+</div>
+
+<div class="watchlist-filtros">
+    <label class="modal-form__campo">
+        Equipo
+        <select id="filtro-equipo">
+            <option value="">Todos los equipos</option>
+            <option th:each="grupo : ${grupos}" th:value="${grupo.equipo.id}" th:text="${grupo.equipo.nombre}"></option>
+        </select>
+    </label>
+    <label class="modal-form__campo">
+        Jugador
+        <input type="text" id="filtro-jugador" placeholder="Buscar jugador...">
+    </label>
+</div>
+
+<div id="watchlist-grupos">
+    <div class="watchlist-grupo" th:each="grupo : ${grupos}" th:data-equipo-id="${grupo.equipo.id}">
+        <h2 th:text="${grupo.equipo.nombre}"></h2>
+
+        <div th:each="jw : ${grupo.jugadores}" class="watchlist-seccion" data-tipo="jugador"
+             th:data-jugador-nombre="${jw.jugador.nombre}">
+            <h3>
+                <a th:href="@{/jugadores/{id}(id=${jw.jugador.id})}" th:text="${jw.jugador.nombre}"></a>
+            </h3>
+            <p th:if="${jw.videos.isEmpty()}" class="watchlist-sin-videos">Sin vídeos guardados.</p>
+            <ul class="watchlist-lista">
+                <li th:each="video : ${jw.videos}">
+                    <button type="button" class="watchlist-video"
+                            th:data-video-src="${video.embedUrl}"
+                            th:text="${video.titulo} ?: ${video.url}"></button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <p th:if="${grupos.isEmpty()}">Todavía no hay equipos ni jugadores en la watchlist de esta competición.</p>
+</div>
+
+<script th:src="@{/js/watchlist.js}"></script>
+
+</body>
+</html>

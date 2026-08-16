@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${competicion.nombre}"></title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar(competicionId=${competicion.id}, volverUrl=@{/competiciones})}"></div>
+
+<h1 th:text="${competicion.nombre} + ' (' + ${competicion.year} + ')'"></h1>
+<p th:text="${competicion.descripcion}"></p>
+
+<div class="acciones-fila">
+    <a class="btn" th:href="@{/liga/{id}/watchlist(id=${competicion.id})}">Ver watchlist</a>
+</div>
+
+<h2>Equipos</h2>
+<div th:if="${importados != null}" class="ficha-info__campo" style="margin-bottom:1rem;">
+    <p th:text="'Importados: ' + ${importados} + ' jugador(es).'"></p>
+    <ul th:if="${erroresImport != null and !erroresImport.isEmpty()}">
+        <li th:each="error : ${erroresImport}" th:text="${error}" style="color: var(--color-danger);"></li>
+    </ul>
+</div>
+<div class="acciones-fila">
+    <button type="button" class="btn" onclick="document.getElementById('dialog-nuevo-equipo').showModal()">+ Nuevo equipo</button>
+    <form th:action="@{/liga/{id}/jugadores/importar(id=${competicion.id})}" method="post" enctype="multipart/form-data" class="acciones-fila" style="margin:0;">
+        <input type="file" name="archivo" accept=".csv" required>
+        <button type="submit" class="btn btn--secondary">Importar jugadores (CSV)</button>
+    </form>
+</div>
+
+<dialog id="dialog-nuevo-equipo" class="modal">
+    <form class="modal-form" th:action="@{/equipos}" method="post">
+        <h3>Nuevo equipo</h3>
+
+        <input type="hidden" name="competicionId" th:value="${competicion.id}">
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo">
+                Nombre oficial
+                <input type="text" name="nombre" required>
+            </label>
+            <label class="modal-form__campo">
+                Abreviatura
+                <input type="text" name="abreviatura" maxlength="3">
+            </label>
+            <label class="modal-form__campo">
+                Logo (URL)
+                <input type="text" name="logoUrl" placeholder="/images/logos/equipo.png">
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo modal-form__campo--ancho">
+                Descripción
+                <textarea name="descripcion"></textarea>
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo">
+                Entrenador
+                <input type="text" name="entrenador">
+            </label>
+            <label class="modal-form__campo">
+                Cuerpo técnico
+                <input type="text" name="staff">
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo">
+                Ubicación
+                <input type="text" name="ubicacion">
+            </label>
+            <label class="modal-form__campo">
+                Pabellón
+                <input type="text" name="pabellon">
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo">
+                Predicción
+                <input type="text" name="prediccion">
+            </label>
+            <label class="modal-form__campo">
+                Historial
+                <textarea name="historial"></textarea>
+            </label>
+        </div>
+
+        <div class="modal-form__fila">
+            <label class="modal-form__campo">
+                Europa
+                <select name="europa">
+                    <option value="">-</option>
+                    <option th:each="l : ${T(com.doubleb.bbms.model.enums.Europa).values()}"
+                            th:value="${l}" th:text="${l.label}"></option>
+                </select>
+            </label>
+        </div>
+
+        <div class="modal-form__acciones">
+            <button type="button" class="btn btn--ghost" onclick="this.closest('dialog').close()">Cancelar</button>
+            <button type="submit" class="btn">Guardar</button>
+        </div>
+    </form>
+</dialog>
+
+<div class="equipos-grid">
+    <a class="equipo-card" th:each="equipo : ${equipos}"
+       th:href="@{/equipos/{id}(id=${equipo.id})}">
+        <div class="equipo-card__logo">
+            <img th:src="${equipo.logoUrl} ?: @{/images/logos/default-equipo.svg}" th:alt="${equipo.nombre}">
+        </div>
+        <div class="equipo-card__nombre">
+            <span th:text="${equipo.nombre}"></span>
+        </div>
+    </a>
+</div>
+
+<div class="acciones-fila">
+    <a class="btn btn--secondary" th:href="@{/liga/{id}/plantillas(id=${competicion.id})}">Ver plantillas de todos los equipos</a>
+</div>
+
+<h2>Calendario</h2>
+<div class="acciones-fila">
+    <a class="btn btn--secondary" th:href="@{/liga/{id}/calendario(id=${competicion.id})}">Ver calendario completo</a>
+</div>
+
+</body>
+</html>
