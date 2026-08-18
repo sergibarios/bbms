@@ -849,3 +849,7 @@ update jugadores set cm=?,contrato=?,descripcion=?,dob=?,equipo_id=?,foto_url=?,
 	at org.apache.tomcat.util.threads.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:480)
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:57)
 	at java.base/java.lang.Thread.run(Thread.java:1474)
+2026-08-18 09:50:37.099327+02:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Error de Sintaxis en sentencia SQL "[*]EQUIPOS"; se esperaba "EXPLAIN, EXECUTE"
+Syntax error in SQL statement "[*]EQUIPOS"; expected "EXPLAIN, EXECUTE"; SQL statement:
+EQUIPOS [42001-240]
